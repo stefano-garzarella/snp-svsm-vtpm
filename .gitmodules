@@ -1,0 +1,25 @@
+[submodule "qemu"]
+	path = qemu
+	url = https://github.com/coconut-svsm/qemu
+	branch = svsm-igvm
+[submodule "svsm"]
+	path = svsm
+	url = https://github.com/stefano-garzarella/svsm.git
+	branch = vtpm-state-injection
+[submodule "edk2"]
+	path = edk2
+	url = https://github.com/coconut-svsm/edk2.git
+	branch = svsm
+[submodule "kbs/reference-kbs"]
+	path = kbs/reference-kbs
+	url = https://github.com/stefano-garzarella/reference-kbs.git
+	branch = svsm
+[submodule "kbs/raclients"]
+	path = kbs/raclients
+	url = https://github.com/stefano-garzarella/raclients.git
+[submodule "ms-tpm-containerized-build"]
+	path = ms-tpm-containerized-build
+	url = https://github.com/stefano-garzarella/ms-tpm-containerized-build.git
+[submodule "igvm"]
+	path = igvm
+	url = https://github.com/microsoft/igvm

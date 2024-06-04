@@ -1,0 +1,4 @@
+images/*.ks
+images/*.qcow2
+*.sock
+install/*
