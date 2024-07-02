@@ -57,7 +57,7 @@ sudo dnf builddep https://src.fedoraproject.org/rpms/qemu/raw/f40/f/qemu.spec
 sudo dnf builddep https://src.fedoraproject.org/rpms/edk2/raw/f40/f/edk2.spec
 sudo dnf install cargo rust rust-std-static-x86_64-unknown-none \
                  autoconf automake autoconf-archive \
-                 buildah podman cbindgen CUnit-devel
+                 buildah podman cbindgen bindgen-cli CUnit-devel
 ```
 
 ## Demo
