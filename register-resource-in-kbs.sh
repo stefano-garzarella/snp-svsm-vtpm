@@ -11,15 +11,22 @@ function usage
     echo -e ""
     echo -e "Register launch measurement and the TPM state in KBS"
     echo -e ""
-    echo -e " -s, --state         TPM state file (NVChip) [default: ${TPM_STATE}]"
+    echo -e " -p, --passphrase    passphrase"
+    echo -e " -t, --tpm           TPM state file (NVChip) [default: ${TPM_STATE}]"
     echo -e " -h, --help          print this help"
 }
 
+RESOURCE=
+
 while [ "$1" != "" ]; do
     case $1 in
-        -s | --state )
+        -p | --passphrase )
             shift
-            TPM_STATE=$1
+            RESOURCE="--passphrase $1"
+            ;;
+        -t | --tpm )
+            shift
+            RESOURCE="--resource $1"
             ;;
         -h | --help )
             usage
@@ -41,5 +48,5 @@ MEASUREMENT="$("${SCRIPT_PATH}/svsm/target/x86_64-unknown-linux-gnu/debug/igvmme
 pushd "${SCRIPT_PATH}/kbs/raclients"
 cargo run --example=svsm-register --all-features -- --url "${KBS_URL}" \
     --reference-kbs --workload-id svsm \
-    --resource "${TPM_STATE}" --measurement "${MEASUREMENT}"
+    ${RESOURCE} --measurement "${MEASUREMENT}"
 popd

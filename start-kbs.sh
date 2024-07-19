@@ -49,7 +49,8 @@ done
 set -x
 
 pushd "${SCRIPT_PATH}/kbs/raclients"
-RUST_LOG=info cargo run --example=svsm-proxy -- --unix "${PROXY_SOCK}"  --url "${KBS_URL}" -f
+RUST_LOG=info cargo run --example=proxy-reference-kbs -- --unix "${PROXY_SOCK}" \
+    --url "${KBS_URL}" --workload-id svsm -f
 popd
 
 kill "$(jobs -p)"
