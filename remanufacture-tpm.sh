@@ -32,9 +32,13 @@ set -ex
 
 [ -f "${TPM_STATE}" ] && md5sum ${TPM_STATE}
 
-pushd "${SCRIPT_PATH}/ms-tpm-containerized-build"
-git submodule update --init
-make manufacture
-popd
+#TODO: pre-fill the vTPM state in the SVSM state
+#pushd "${SCRIPT_PATH}/ms-tpm-containerized-build"
+#git submodule update --init
+#make manufacture
+#popd
+
+#HACK: just clear the SVSM state to re-manufacture it by SVSM
+rm -f ${TPM_STATE}; truncate -s16M ${TPM_STATE}
 
 md5sum ${TPM_STATE}

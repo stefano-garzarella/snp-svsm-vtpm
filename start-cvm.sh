@@ -39,4 +39,5 @@ set -ex
 
 ${SCRIPT_PATH}/svsm/scripts/launch_guest.sh --qemu "${QEMU}" \
     --proxy "${PROXY_SOCK}" \
+    --state "${TPM_STATE}" \
     ${IMAGE}
