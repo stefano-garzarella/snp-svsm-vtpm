@@ -11,9 +11,8 @@ function usage
     echo -e ""
     echo -e "Register launch measurement and the TPM state in KBS"
     echo -e ""
-    echo -e " -p, --passphrase    passphrase"
-    echo -e " -t, --tpm           TPM state file (NVChip) [default: ${TPM_STATE}]"
-    echo -e " -h, --help          print this help"
+    echo -e " -p, --passphrase {PASS}   passphrase"
+    echo -e " -h, --help                print this help"
 }
 
 RESOURCE=
@@ -23,10 +22,6 @@ while [ "$1" != "" ]; do
         -p | --passphrase )
             shift
             RESOURCE="--passphrase $1"
-            ;;
-        -t | --tpm )
-            shift
-            RESOURCE="--resource $1"
             ;;
         -h | --help )
             usage

@@ -5,7 +5,7 @@ SCRIPT_PATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 # Load VM configuration
 source "${SCRIPT_PATH}/vm.conf"
 
-IMAGE=
+IMAGE="--image ${CVM_IMAGE}"
 
 function usage
 {
@@ -13,7 +13,7 @@ function usage
     echo -e ""
     echo -e "Start QEMU Confidential VM"
     echo -e ""
-    echo -e "     --image {PATH}  path to the VM disk image"
+    echo -e "     --image {PATH}  path to the VM disk image [default: ${CVM_IMAGE}]"
     echo -e " -h, --help          print this help"
 }
 
