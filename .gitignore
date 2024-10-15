@@ -2,4 +2,5 @@ images/*.ks
 images/*.qcow2
 *.sock
 *.raw
+*.log
 install/*

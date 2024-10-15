@@ -64,17 +64,6 @@ to unseal the LUKS key.
 ./build-vm-image.sh --passphrase <LUKS passphrase>
 ```
 
-### Manufacture the MS TPM
-
-This operation is only required the first time, or when we want to regenerate
-the TPM state.
-In this way, the TPM's EK are recreated and NV state reset, so all sealed
-secrets can no longer be unsealed.
-
-```shell
-./remanufacture-tpm.sh
-```
-
 ### Start Key Broker server and SVSM proxy
 
 This script starts in the host the Key Broker server (it will be remote in a
@@ -95,6 +84,21 @@ registers it in the Key Broker server along with the SVSM state key (512 bits).
 # we are using XTS for the encryption layer with AES256
 # XTS requires two AES256 keys, so 512 bits (64 bytes) in total
 ./register-resource-in-kbs.sh -p $(openssl rand -hex 64)
+```
+
+### Manufacture the MS TPM
+
+This operation is only required the first time, or when we want to regenerate
+the TPM state.
+In this way, the TPM's EK are recreated and NV state reset, so all sealed
+secrets can no longer be unsealed.
+
+Note: We currently do not have a tool available, so the script clears the SVSM
+state and launches a diskless CVM. In this way SVSM, finding the state empty,
+generates a new vTPM.
+
+```shell
+./remanufacture-tpm.sh
 ```
 
 ### Start the Confidential VM
