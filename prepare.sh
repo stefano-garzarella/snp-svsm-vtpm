@@ -55,7 +55,7 @@ export PYTHON_COMMAND=python3
 make -j"$(nproc)" -C BaseTools/
 {
     source ./edksetup.sh --reconfig
-    build -a X64 -b DEBUG -t GCC5 -D DEBUG_ON_SERIAL_PORT -D DEBUG_VERBOSE -DTPM2_ENABLE -p OvmfPkg/OvmfPkgX64.dsc
+    build -a X64 -b DEBUG -t GCC5 -DTPM2_ENABLE -p OvmfPkg/OvmfPkgX64.dsc
 }
 popd
 
