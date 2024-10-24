@@ -209,6 +209,37 @@ systemd-cryptenroll /dev/sda3 --tpm2-device=auto --tpm2-pcrs=0,1,4,5,7,9
 <LUKS passphrase>
 ```
 
+### Install EK certificate in the vTPM NVRAM
+
+The MS-TPM does not generate an EK certificate during manufacture, so
+launching `tpm2_getekcertificate` or `tpm2_nvread 0x1c00002` in the CVM will
+get an error.
+
+In the future we will provide a tool to generate the EK certificate and
+install it offline in the vTPM, but for now we can generate it directly in
+the VM on the first boot:
+
+```
+git clone https://github.com/stefano-garzarella/tpm2_ek_cert_generator.git
+cd tpm2_ek_cert_generator
+make
+```
+
+At this point the EK certificate is written in the NVRAM, so the following
+commands now works also after reboot:
+```
+tpm2_getekcertificate
+tpm2_nvread 0x1c00002
+```
+
+The certificate is self-signed, but in this PoC we only use it to test the
+vTPM functionality.
+
+Note: The `tpm2_ek_cert_generator` installs the certificate in the owner
+hierarchy, because the platform hierarchy is disabled by EDK2. When the script
+for offline manufacturing will become available, we could use the platform
+hierarchy.
+
 ### Seal and unseal secrets in the Confidential VM
 
 #### Seal a secret
