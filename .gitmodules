@@ -1,6 +1,6 @@
 [submodule "edk2"]
 	path = edk2
-	url = https://github.com/coconut-svsm/edk2.git
+	url = https://github.com/stefano-garzarella/edk2.git
 	branch = svsm
 [submodule "kbs/reference-kbs"]
 	path = kbs/reference-kbs
