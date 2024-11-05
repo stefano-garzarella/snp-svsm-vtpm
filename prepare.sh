@@ -28,6 +28,7 @@ done
 set -ex
 
 pushd "${SCRIPT_PATH}"
+git submodule sync
 git submodule update --init
 popd
 
@@ -49,6 +50,7 @@ make -j"$(nproc)"
 popd
 
 pushd "${SCRIPT_PATH}/edk2"
+git submodule sync
 git submodule update --init
 export PYTHON3_ENABLE=TRUE
 export PYTHON_COMMAND=python3
@@ -60,11 +62,13 @@ make -j"$(nproc)" -C BaseTools/
 popd
 
 pushd "${SCRIPT_PATH}/ms-tpm-containerized-build"
+git submodule sync
 git submodule update --init
 make
 popd
 
 pushd "${SCRIPT_PATH}/svsm"
+git submodule sync
 git submodule update --init
 make utils/cbit
 FW_FILE=${SCRIPT_PATH}/edk2/Build/OvmfX64/DEBUG_GCC5/FV/OVMF.fd make
