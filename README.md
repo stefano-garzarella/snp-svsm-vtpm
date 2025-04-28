@@ -9,6 +9,10 @@ The vTPM state is saved encrypted in the SVSM state file and exposed to SVSM
 as a virtio-blk device over MMIO.
 Remote attestation is used to get the SVSM state key after a successful attestation.
 
+This PoC is based on the following Coconut SVSM PRs:
+- https://github.com/coconut-svsm/svsm/pull/635
+- https://github.com/coconut-svsm/svsm/pull/528
+
 ## Prerequisites
 
 ### Host machine

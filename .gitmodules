@@ -1,14 +1,6 @@
 [submodule "edk2"]
 	path = edk2
-	url = https://github.com/stefano-garzarella/edk2.git
-	branch = svsm
-[submodule "kbs/reference-kbs"]
-	path = kbs/reference-kbs
-	url = https://github.com/stefano-garzarella/reference-kbs.git
-	branch = svsm
-[submodule "kbs/raclients"]
-	path = kbs/raclients
-	url = https://github.com/stefano-garzarella/raclients.git
+	url = https://github.com/osteffenrh/edk2.git
 [submodule "ms-tpm-containerized-build"]
 	path = ms-tpm-containerized-build
 	url = https://github.com/stefano-garzarella/ms-tpm-containerized-build.git
@@ -18,8 +10,9 @@
 [submodule "svsm"]
 	path = svsm
 	url = https://github.com/stefano-garzarella/svsm.git
-	branch = vtpm-stateful
 [submodule "qemu"]
 	path = qemu
 	url = https://github.com/osteffenrh/qemu.git
-	branch = virtio-pr
+[submodule "kbs/kbs-test"]
+	path = kbs/kbs-test
+	url = https://github.com/tylerfanelli/kbs-test.git
