@@ -9,19 +9,21 @@ function usage
 {
     echo -e "usage: $0 [OPTION...]"
     echo -e ""
-    echo -e "Register launch measurement and the TPM state in KBS"
+    echo -e "Register launch measurement and the TPM state key in KBS"
     echo -e ""
     echo -e " -p, --passphrase {PASS}   passphrase"
     echo -e " -h, --help                print this help"
 }
 
-RESOURCE=
+# we are using XTS for the encryption layer with AES256
+# XTS requires two AES256 keys, so 512 bits (64 bytes) in total
+SECRET="$(openssl rand -hex 64)"
 
 while [ "$1" != "" ]; do
     case $1 in
         -p | --passphrase )
             shift
-            RESOURCE="--passphrase $1"
+            SECRET="$1"
             ;;
         -h | --help )
             usage
@@ -40,8 +42,11 @@ set -ex
 MEASUREMENT="$("${SCRIPT_PATH}/svsm/target/x86_64-unknown-linux-gnu/debug/igvmmeasure" \
     --check-kvm ${SCRIPT_PATH}/svsm/bin/coconut-qemu.igvm measure -b)"
 
-pushd "${SCRIPT_PATH}/kbs/raclients"
-cargo run --example=svsm-register --all-features -- --url "${KBS_URL}" \
-    --reference-kbs --workload-id svsm \
-    ${RESOURCE} --measurement "${MEASUREMENT}"
-popd
+echo $MEASUREMENT | xxd -r -p | base64 -w 0 > $KBS_MEASUREMENT
+echo $SECRET | xxd -r -p | base64 -w 0 > $KBS_SECRET
+
+if [ -f "$KBS_PID" ]; then
+    PID=$(cat "$KBS_PID")
+    rm -f "$KBS_PID"
+    kill "$PID" 2>/dev/null
+fi
