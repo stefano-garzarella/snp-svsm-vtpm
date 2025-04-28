@@ -4,3 +4,6 @@ images/*.qcow2
 *.raw
 *.log
 install/*
+kbs/kbs.pid
+kbs/kbs.measurement
+kbs/kbs.secret

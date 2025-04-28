@@ -87,7 +87,9 @@ registers it in the Key Broker server along with the SVSM state key (512 bits).
 ```shell
 # we are using XTS for the encryption layer with AES256
 # XTS requires two AES256 keys, so 512 bits (64 bytes) in total
-./register-resource-in-kbs.sh -p $(openssl rand -hex 64)
+SECRET="$(openssl rand -hex 64)"
+
+./register-resource-in-kbs.sh -p "$SECRET"
 ```
 
 ### Manufacture the MS TPM
@@ -307,7 +309,10 @@ KBS. In this way SVSM is unable to access the previous state and thus the
 emulated TPM is unable to unseal the keys.
 
 ```
-# Register a new SVMS encryption state key
+# Generate a new encryption key
+SECRET="$(openssl rand -hex 64)"
+
+# Register the new SVMS encryption state key
 ./register-resource-in-kbs.sh -p $(openssl rand -hex 64)
 
 # Start the CVM

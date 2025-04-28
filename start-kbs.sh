@@ -34,23 +34,44 @@ while [ "$1" != "" ]; do
     shift
 done
 
-pushd "${SCRIPT_PATH}/kbs/reference-kbs"
 if [ "${FLUSH_DB}" == "1" ]; then
-    rm -f db/diesel/db.sqlite
+    rm $KBS_MEASUREMENT $KBS_SECRET
 fi
-cargo run &
-popd
 
-# Wait till the server is listening on port 8000
-while ! netstat -tna | grep 'LISTEN\>' | grep -q ':8000\>'; do
-  sleep 1
-done
+monitor_kbs() {
+    pushd "${SCRIPT_PATH}/kbs/kbs-test"
+    while true; do
+        echo "KBS reloading"
+        cargo run -- -m "$(cat $KBS_MEASUREMENT 2>/dev/null)" \
+            -s "$(cat $KBS_SECRET 2>/dev/null)" &
+        echo $! > "$KBS_PID"
+        wait $!
+        sleep 1
+    done
+    popd
+}
+
+cleanup() {
+    if [ -n "$MONITOR_PID" ]; then
+        kill $MONITOR_PID 2>/dev/null
+    fi
+
+    if [ -f "$KBS_PID" ]; then
+        PID=$(cat "$KBS_PID")
+        rm -f "$KBS_PID"
+        kill "$PID" 2>/dev/null
+    fi
+
+    exit 0
+}
+
+trap cleanup SIGINT
+
+monitor_kbs &
+MONITOR_PID=$!
 
 set -x
 
-pushd "${SCRIPT_PATH}/kbs/raclients"
-RUST_LOG=info cargo run --example=proxy-reference-kbs -- --unix "${PROXY_SOCK}" \
-    --url "${KBS_URL}" --workload-id svsm -f
+pushd "${SCRIPT_PATH}/svsm"
+bin/aproxy --protocol kbs --unix "${PROXY_SOCK}" --url "${KBS_URL}" --force
 popd
-
-kill "$(jobs -p)"
