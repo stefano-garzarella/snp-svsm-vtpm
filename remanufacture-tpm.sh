@@ -55,11 +55,12 @@ script -q -f -c "${SCRIPT_PATH}/svsm/scripts/launch_guest.sh --qemu ${QEMU} \
 CVM_PID=$!
 
 set +x
-# Wait for the UEFI shell expected since there is no disk attached to the CVM
+# Wait for the no device found message expected since there is no disk
+# attached to the CVM
 tail -f ${LOG_FILE} \
     | while IFS= read -r line; do
         #echo "$line"
-        if [[ "$line" == *"UEFI Interactive Shell"* ]]; then
+        if [[ "$line" == *"No bootable option or device was found"* ]]; then
             kill ${CVM_PID}
             break
         fi
