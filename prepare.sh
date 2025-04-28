@@ -71,6 +71,6 @@ popd
 pushd "${SCRIPT_PATH}/svsm"
 git submodule sync
 git submodule update --init
-make utils/cbit
-FW_FILE=${SCRIPT_PATH}/edk2/Build/OvmfX64/DEBUG_GCC5/FV/OVMF.fd make
+make utils/cbit aproxy
+FW_FILE=${SCRIPT_PATH}/edk2/Build/OvmfX64/DEBUG_GCC5/FV/OVMF.fd FEATURES=vtpm,attest make
 popd
