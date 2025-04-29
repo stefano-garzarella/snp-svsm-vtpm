@@ -2,17 +2,23 @@
 
 SCRIPT_PATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 
+CLEAN=0
+
 function usage
 {
     echo -e "usage: $0 [OPTION...]"
     echo -e ""
     echo -e "Initialize git submodules and build QEMU, EDK2, SVSM, etc."
     echo -e ""
+    echo -e " -c, --clean         clean all previous artifacts"
     echo -e " -h, --help          print this help"
 }
 
 while [ "$1" != "" ]; do
     case $1 in
+        -c | --clean )
+            CLEAN=1
+            ;;
         -h | --help )
             usage
             exit
@@ -28,6 +34,10 @@ done
 set -ex
 
 pushd "${SCRIPT_PATH}"
+if [ "${CLEAN}" == "1" ]; then
+    git clean -xfd
+    git submodule foreach --recursive git clean -xfd
+fi
 git submodule sync
 git submodule update --init
 popd
