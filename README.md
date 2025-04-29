@@ -34,11 +34,11 @@ sudo dnf install kernel-snp-coconut
 
 This repository contains the QEMU code, EDK2 code, MS TPM simulator, and several
 Rust projects, so I recommend that you install the following packages
-(for Fedora 40) to use the scripts contained in this demo:
+(for Fedora 41) to use the scripts contained in this demo:
 
 ```
-sudo dnf builddep https://src.fedoraproject.org/rpms/qemu/raw/f40/f/qemu.spec
-sudo dnf builddep https://src.fedoraproject.org/rpms/edk2/raw/f40/f/edk2.spec
+sudo dnf builddep https://src.fedoraproject.org/rpms/qemu/raw/f41/f/qemu.spec
+sudo dnf builddep https://src.fedoraproject.org/rpms/edk2/raw/f41/f/edk2.spec
 sudo dnf install cargo rust rust-std-static-x86_64-unknown-none \
                  autoconf automake autoconf-archive \
                  buildah podman cbindgen bindgen-cli CUnit-devel openssl \
