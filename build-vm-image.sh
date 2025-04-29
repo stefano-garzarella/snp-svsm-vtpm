@@ -80,4 +80,8 @@ virt-install --connect qemu:///session \
     --initrd-inject "${LUKS_KS}" --extra-args "inst.ks=file:/luks.ks console=ttyS0" \
     --tpm none --boot uefi
 
+echo "You can ignore \"Domain installation does not appear to have been successful\""
+echo "message. CVM doesn't support reboot, so virt-install rebooting will fail,"
+echo "but your VM image is ready, enjoy!"
+
 #rm "${LUKS_KS}"
