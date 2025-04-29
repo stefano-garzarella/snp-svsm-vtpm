@@ -36,7 +36,7 @@ This repository contains the QEMU code, EDK2 code, MS TPM simulator, and several
 Rust projects, so I recommend that you install the following packages
 (for Fedora 41) to use the scripts contained in this demo:
 
-```
+```shell
 sudo dnf builddep https://src.fedoraproject.org/rpms/qemu/raw/f41/f/qemu.spec
 sudo dnf builddep https://src.fedoraproject.org/rpms/edk2/raw/f41/f/edk2.spec
 sudo dnf install cargo rust rust-std-static-x86_64-unknown-none \
@@ -69,7 +69,11 @@ The script will also install the coconut kernel for the guest, put the
 to unseal the LUKS key.
 
 ```shell
-./build-vm-image.sh --passphrase <LUKS passphrase>
+# Default LUKS passphrase used: MY-LUKS-PASSPHRASE
+./build-vm-image.sh
+
+# Or you can specify your
+./build-vm-image.sh --passphrase <custom LUKS passphrase>
 ```
 
 ### Start Key Broker server and SVSM proxy
@@ -129,7 +133,7 @@ included in this repo), the passphrase will be requested during the first boot:
 
 ```
 Please enter passphrase for disk QEMU_HARDDISK (luks-bf91e8fe-c1e3-4696-937f-51c83d312eb9)::
-<LUKS passphrase>
+# MY-LUKS-PASSPHRASE or <custom LUKS passphrase>
 ```
 
 After entering the right passphrase, the rootfs will be mounted and we have
@@ -140,25 +144,33 @@ unlock the disk at every boot.
 Then, using `systemd-cryptenroll`, we can seal the LUKS passphrase with the TPM
 and use different PCRs as policy.
 
-```
+```shell
 # identify the LUKS encrypted volume
 blkid -t TYPE=crypto_LUKS
 /dev/sda3: UUID="bf91e8fe-c1e3-4696-937f-51c83d312eb9" TYPE="crypto_LUKS" PARTUUID="a7a021b0-f96d-431c-a94f-97ba8761228c"
 
 # install the LUKS key for /dev/sda3 using as policy the PCRs 0,1,4,5,7,9
-systemd-cryptenroll /dev/sda3 --tpm2-device=auto --tpm2-pcrs=0,1,4,5,7,9
-<LUKS passphrase>
+systemd-cryptenroll /dev/sda3 --wipe-slot=tpm2 --tpm2-device=auto --tpm2-pcrs=0,1,4,5,7,9
+# MY-LUKS-PASSPHRASE or <custom LUKS passphrase>
 ```
 
 Rebooting CVM we can see how the LUKS passphrase is no longer required,
-as it is sealed with the TPM.
+as it is sealed with the TPM:
+
+```shell
+poweroff
+
+./start-cvm.sh
+
+# LUKS passphrase no longer required, console will reach the login
+```
 
 #### Change the Linux `cmdline` to alter a PCR
 
 Linux's cmdline is measured in PCR 9, so to see what happens when a policy
 changes, let's alter the cmdline:
 
-```
+```shell
 # read PCR 9
 tpm2_pcrread sha256:9
   sha256:
@@ -169,25 +181,43 @@ grubby --update-kernel=ALL --args="foo"
 ```
 
 Rebooting CVM we find that the rootfs is no longer automatically unlocked,
-as PCR 9 is different. After entering the requested LUKS passphrase during
-boot, we can check the PCR 9 and re-install the key:
+as PCR 9 is different.
 
+
+```shell
+poweroff
+
+./start-cvm.sh
+
+# LUKS passphrase is now required, since PCR 9 is now different:
+# Please enter passphrase for disk QEMU_HARDDISK (luks-bf91e8fe-c1e3-4696-937f-51c83d312eb9)::
+# MY-LUKS-PASSPHRASE or <custom LUKS passphrase>
 ```
+
+After entering the requested LUKS passphrase during boot, we can check the
+PCR 9 and re-install the key:
+
+```shell
 # read PCR 9
 tpm2_pcrread sha256:9
   sha256:
     9 : 0xC7824417EDF7422F2011931ECAC930B789AACAA6E68175622347736D71DEE920
 
-# wipe previous keys
-systemd-cryptenroll /dev/sda3 --wipe-slot=tpm2
-
-# install the LUKS key for /dev/sda3 using as policy the PCRs 0,1,4,5,7,9
-systemd-cryptenroll /dev/sda3 --tpm2-device=auto --tpm2-pcrs=0,1,4,5,7,9
-<LUKS passphrase>
+# Update the LUKS key for /dev/sda3 using as policy the PCRs 0,1,4,5,7,9
+systemd-cryptenroll /dev/sda3 --wipe-slot=tpm2 --tpm2-device=auto --tpm2-pcrs=0,1,4,5,7,9
+# MY-LUKS-PASSPHRASE or <custom LUKS passphrase>
 ```
 
 At this point we can reboot and have the rootfs automatically unlock again
-until the PCRs 0,1,4,5,7,9 are unchanged.
+until the PCRs 0,1,4,5,7,9 are unchanged:
+
+```shell
+poweroff
+
+./start-cvm.sh
+
+# LUKS passphrase no longer required, console will reach the login
+```
 
 #### Re-manufacture the TPM
 
@@ -198,25 +228,25 @@ longer be able to unseal the secret.
 So let's try re-manufacturing it. In this way the TPM's EK are regenerated and
 NV state completely reset.
 
-```
+```shell
 # Re-manufacture the MS TPM state
 ./remanufacture-tpm.sh
 
-# Start the CVM
 ./start-cvm.sh
+
+# LUKS passphrase is now required, since the TPM is re-manufactured:
+# Please enter passphrase for disk QEMU_HARDDISK (luks-bf91e8fe-c1e3-4696-937f-51c83d312eb9)::
+# MY-LUKS-PASSPHRASE or <custom LUKS passphrase>
 ```
 
 Rebooting CVM we find that the rootfs is no longer automatically unlocked, as
 the TPM is a new one. After entering the requested LUKS passphrase during
 boot, we can re-install the key:
 
-```
-# wipe previous keys
-systemd-cryptenroll /dev/sda3 --wipe-slot=tpm2
-
-# install the LUKS key for /dev/sda3 using as policy the PCRs 0,1,4,5,7,9
-systemd-cryptenroll /dev/sda3 --tpm2-device=auto --tpm2-pcrs=0,1,4,5,7,9
-<LUKS passphrase>
+```shell
+# Update the LUKS key for /dev/sda3 using as policy the PCRs 0,1,4,5,7,9
+systemd-cryptenroll /dev/sda3 --wipe-slot=tpm2 --tpm2-device=auto --tpm2-pcrs=0,1,4,5,7,9
+# MY-LUKS-PASSPHRASE or <custom LUKS passphrase>
 ```
 
 ### Install EK certificate in the vTPM NVRAM
@@ -229,7 +259,7 @@ In the future we will provide a tool to generate the EK certificate and
 install it offline in the vTPM, but for now we can generate it directly in
 the VM on the first boot:
 
-```
+```shell
 git clone https://github.com/stefano-garzarella/tpm2_ek_cert_generator.git
 cd tpm2_ek_cert_generator
 make
@@ -237,7 +267,7 @@ make
 
 At this point the EK certificate is written in the NVRAM, so the following
 commands now works also after reboot:
-```
+```shell
 tpm2_getekcertificate
 tpm2_nvread 0x1c00002
 ```
@@ -257,7 +287,7 @@ hierarchy.
 Now that we have the VM running with the vTPM, we can do secret sealing, also
 linking it to certain PCRs.
 
-```
+```shell
 PRIMARY_CTX=/tmp/current_primary.ctx
 tpm2_createprimary -c "$PRIMARY_CTX"
 
@@ -267,15 +297,21 @@ echo "secret" | tpm2_create -C "$PRIMARY_CTX" -L pcr.policy -i - -u seal.pub -r 
 ```
 
 This secret can only be released if the TPM state is preserved, so let's try
-shutting down the VM and turning it back on.
+shutting down the VM and turning it back on:
+
+```shell
+poweroff
+
+./start-cvm.sh
+```
 
 #### Unseal the secret after a reboot
 
-```
+```shell
 PRIMARY_CTX=/tmp/current_primary.ctx
 tpm2_createprimary -c "$PRIMARY_CTX"
 
-tpm2_load -C "$PRIMARY_CTX" -u seal.pub -r seal.priv -c seal.ctx 
+tpm2_load -C "$PRIMARY_CTX" -u seal.pub -r seal.priv -c seal.ctx
 tpm2_unseal -c seal.ctx -p pcr:sha256:0,1,2,3
 ```
 
@@ -288,18 +324,17 @@ To see what happens if the state of the vTPM changes, let's try
 re-manufacturing it. In this way the TPM's EK are regenerated and NV state
 completely reset.
 
-```
+```shell
 # Re-manufacture the MS TPM state
 ./remanufacture-tpm.sh
 
-# Start the CVM
 ./start-cvm.sh
 ```
 
 If we try the same steps as in the previous paragraph for unsealing, we see
 that this fails because we basically have a new TPM.
 
-```
+```shell
 $ tpm2_load -C "$PRIMARY_CTX" -u seal.pub -r seal.priv -c seal.ctx
 WARNING:esys:src/tss2-esys/api/Esys_Load.c:324:Esys_Load_Finish() Received TPM Error 
 ERROR:esys:src/tss2-esys/api/Esys_Load.c:112:Esys_Load() Esys Finish ErrorCode (0x000001df) 
@@ -312,20 +347,19 @@ The same behavior is also obtained by changing the encryption key registered in
 KBS. In this way SVSM is unable to access the previous state and thus the
 emulated TPM is unable to unseal the keys.
 
-```
+```shell
 # Generate a new encryption key
 SECRET="$(openssl rand -hex 64)"
 
 # Register the new SVMS encryption state key
 ./register-resource-in-kbs.sh -p $(openssl rand -hex 64)
 
-# Start the CVM
-./start-cvm.sh --image path/to/guest/disk.qcow2
+./start-cvm.sh
 ```
 
 And the TPM is not able to unseal the secrets.
 
-```
+```shell
 $ tpm2_load -C "$PRIMARY_CTX" -u seal.pub -r seal.priv -c seal.ctx
 WARNING:esys:src/tss2-esys/api/Esys_Load.c:324:Esys_Load_Finish() Received TPM Error 
 ERROR:esys:src/tss2-esys/api/Esys_Load.c:112:Esys_Load() Esys Finish ErrorCode (0x000001df) 
