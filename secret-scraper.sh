@@ -5,23 +5,28 @@ SCRIPT_PATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 # Load VM configuration
 source "${SCRIPT_PATH}/vm.conf"
 
-IMAGE="--image ${CVM_IMAGE}"
+SECRET=""
+DUMP=1
 
 function usage
 {
     echo -e "usage: $0 [OPTION...]"
     echo -e ""
-    echo -e "Start QEMU Confidential VM"
+    echo -e "Dump QEMU VM memory and search for a secret"
     echo -e ""
-    echo -e "     --image {PATH}  path to the VM disk image [default: ${CVM_IMAGE}]"
+    echo -e " -s, --secret        secret to scrape"
+    echo -e "     --no-dump       do NOT dump the memory, use the one already dumped"
     echo -e " -h, --help          print this help"
 }
 
 while [ "$1" != "" ]; do
     case $1 in
-        --image )
+        -s | --secret )
             shift
-            IMAGE="--image $1"
+            SECRET=$1
+            ;;
+        --no-dump )
+            DUMP=0
             ;;
         -h | --help )
             usage
@@ -37,8 +42,7 @@ done
 
 set -ex
 
-${SCRIPT_PATH}/svsm/scripts/launch_guest.sh --qemu "${QEMU}" \
-    --proxy "${PROXY_SOCK}" \
-    --state "${TPM_STATE}" \
-    --monitor "${QEMU_MONITOR_PORT}" \
-    ${IMAGE}
+if [ "${DUMP}" == "1" ]; then
+    echo "pmemsave 0x0 0xFFFFFFFF vm_ram.bin" | nc localhost ${QEMU_MONITOR_PORT}
+fi
+strings ${SCRIPT_PATH}/vm_ram.bin | grep "$SECRET"

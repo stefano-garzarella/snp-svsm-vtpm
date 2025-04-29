@@ -3,6 +3,7 @@ images/*.qcow2
 *.sock
 *.raw
 *.log
+*.bin
 install/*
 kbs/kbs.pid
 kbs/kbs.measurement

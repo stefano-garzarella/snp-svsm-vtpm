@@ -42,12 +42,10 @@ sudo dnf builddep https://src.fedoraproject.org/rpms/edk2/raw/f41/f/edk2.spec
 sudo dnf install cargo rust rust-std-static-x86_64-unknown-none \
                  autoconf automake autoconf-archive \
                  buildah podman cbindgen bindgen-cli CUnit-devel openssl \
-                 sqlite-devel virt-install
+                 sqlite-devel virt-install ncat
 ```
 
-## Demo
-
-### Build QEMU, EDK2, and SVSM
+## Build QEMU, EDK2, and SVSM
 
 This operation is only required the first time, or when git submodules are updated
 
@@ -59,7 +57,7 @@ This operation is only required the first time, or when git submodules are updat
 ./prepare.sh -c
 ```
 
-### Build the guest image with an encrypted rootfs
+## Build the guest image with an encrypted rootfs
 
 This is only required the first time or when you want to regenerate a new
 image (for example, with a different encryption key).
@@ -75,6 +73,8 @@ to unseal the LUKS key.
 # Or you can specify your
 ./build-vm-image.sh --passphrase <custom LUKS passphrase>
 ```
+
+## Stateful vTPM demo
 
 ### Start Key Broker server and SVSM proxy
 
@@ -366,3 +366,48 @@ ERROR:esys:src/tss2-esys/api/Esys_Load.c:112:Esys_Load() Esys Finish ErrorCode (
 ERROR: Eys_Load(0x1DF) - tpm:parameter(1):integrity check failed
 ```
 
+## Memory encryption demo
+
+### Scraping the memory of a non-confidential VM
+
+Launch a non-confidential VM and then we write a secret in memory:
+
+```shell
+./start-no-cvm.sh
+
+# LUKS passphrase is now required, since the TPM is absent:
+# Please enter passphrase for disk QEMU_HARDDISK (luks-bf91e8fe-c1e3-4696-937f-51c83d312eb9)::
+# MY-LUKS-PASSPHRASE or <custom LUKS passphrase>
+
+echo "SECRET=424242" > /dev/shm/secret
+sync
+```
+
+Now let's go scrape the memory of the guest to see if we can find the secret.
+The script simply asks QEMU to dump the VM's physical memory and then looks
+in the file:
+
+```shell
+./secret-scraper.sh -s "SECRET=424242"
+````
+
+Memory is not encrypted, so in the output we will find our secret.
+
+### Scraping the memory of a confidential VM (CVM)
+
+Now let's do the same, but by launching a confidential VM (CVM):
+
+```shell
+./start-cvm.sh
+
+echo "SECRET=424242" > /dev/shm/secret
+sync
+```
+
+Let's scrape the guest memory again:
+
+```shell
+./secret-scraper.sh -s "SECRET=424242"
+````
+
+This time we cannot read anything because the guest memory is encrypted.
