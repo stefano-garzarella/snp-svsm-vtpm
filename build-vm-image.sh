@@ -83,5 +83,6 @@ virt-install --connect qemu:///session \
 echo "You can ignore \"Domain installation does not appear to have been successful\""
 echo "message. CVM doesn't support reboot, so virt-install rebooting will fail,"
 echo "but your VM image is ready, enjoy!"
+echo "Disk image written to: ${CVM_IMAGE}"
 
 #rm "${LUKS_KS}"
