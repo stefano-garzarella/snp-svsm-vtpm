@@ -21,6 +21,8 @@ This repository can be used for the following demos:
 
 ## Prerequisites
 
+This POC was tested on Fedora 41 and Fedora 42.
+
 ### Host machine
 
 For running this demo, you need the host machine with:
