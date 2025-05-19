@@ -128,6 +128,8 @@ The demo is performed on both a standard virtual machine and a confidential
 virtual machine, allowing a direct comparison of behavior and security
 guarantees.
 
+[![Video demo](https://img.youtube.com/vi/sl_sGMW0Vqo/maxresdefault.jpg)](https://www.youtube.com/watch?v=sl_sGMW0Vqo)
+
 ### Scraping the memory of a non-confidential VM
 
 Launch a non-confidential VM and then we write a secret in memory:
@@ -190,6 +192,8 @@ encrypted state.
 The key needed to unlock this disk is released by a Key Broker Service (KBS)
 only after a successful attestation process, ensuring that the VM is running
 in a trusted environment.
+
+[![Video demo](https://img.youtube.com/vi/TplFlQ6aY1s/maxresdefault.jpg)](https://www.youtube.com/watch?v=TplFlQ6aY1s)
 
 ### Manufacture the MS TPM
 
