@@ -5,6 +5,7 @@ SCRIPT_PATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 source "${SCRIPT_PATH}/vm.conf"
 
 LUKS_KS="${SCRIPT_PATH}/images/luks.ks"
+USE_LIBVIRT=yes
 
 function usage
 {
@@ -25,6 +26,9 @@ while [ "$1" != "" ]; do
         -h | --help )
             usage
             exit
+            ;;
+        --no-libvirt)
+            USE_LIBVIRT=no
             ;;
         * )
             echo -e "\nParameter not found: $1\n"
@@ -74,16 +78,57 @@ dnf install -y kernel-snp-coconut tpm2-tools git make pwgen
 %end
 EOF
 
-virt-install --connect qemu:///session \
-    --ram 4096 --vcpus 4 --disk path="${CVM_IMAGE}",size=20 \
-    --location https://dl.fedoraproject.org/pub/fedora/linux/releases/"${CVM_FEDORA}"/Server/x86_64/os/ \
-    --noreboot --transient --destroy-on-exit --nographic \
-    --initrd-inject "${LUKS_KS}" --extra-args "inst.ks=file:/luks.ks console=ttyS0" \
-    --tpm none --boot uefi
+if [ "$USE_LIBVIRT" == "yes" ]; then
 
-echo "You can ignore \"Domain installation does not appear to have been successful\""
-echo "message. CVM doesn't support reboot, so virt-install rebooting will fail,"
-echo "but your VM image is ready, enjoy!"
+  virt-install --connect qemu:///session \
+      --ram 4096 --vcpus 4 --disk path="${CVM_IMAGE}",size=20 \
+      --location "${INSTALLER_URL}" \
+      --noreboot --transient --destroy-on-exit --nographic \
+      --initrd-inject "${LUKS_KS}" --extra-args "inst.ks=file:/luks.ks console=ttyS0" \
+      --tpm none --boot uefi
+
+  echo "You can ignore \"Domain installation does not appear to have been successful\""
+  echo "message. CVM doesn't support reboot, so virt-install rebooting will fail,"
+  echo "but your VM image is ready, enjoy!"
+
+else
+
+  "$QEMU_IMG" create -f qcow2 "${CVM_IMAGE}" 10G
+
+  OEMDRV=$(mktemp)
+  trap 'rm ${OEMDRV} || true' EXIT
+
+  # Place kickstart file in a disk image
+  truncate -s4M "${OEMDRV}"
+  mkfs.vfat -n OEMDRV "${OEMDRV}"
+  mcopy -o -i "${OEMDRV}" "${LUKS_KS}" ::ks.cfg
+
+  # Download kernel and initrd
+  curl --continue-at - \
+    --remote-name "${INSTALLER_URL}/images/pxeboot/vmlinuz" \
+    --remote-name "${INSTALLER_URL}/images/pxeboot/initrd.img"
+
+  FW_CODE=${SCRIPT_PATH}/edk2/Build/OvmfX64/DEBUG_GCC5/FV/OVMF.fd
+
+  "${QEMU}" \
+    -machine q35 \
+    -machine accel=kvm -boot menu=off \
+    -cpu max \
+    -smp 4 \
+    -m 4G \
+    -blockdev node-name=code,driver=file,filename="${FW_CODE}",read-only=on \
+    -machine pflash0=code \
+    -device virtio-rng-pci \
+    -drive if=virtio,file="${CVM_IMAGE}" \
+    -drive if=virtio,file="${OEMDRV}",read-only=on,format=raw \
+    -kernel ./vmlinuz \
+    -initrd ./initrd.img \
+    -append "console=ttyS0 console= inst.repo=$INSTALLER_URL" \
+    -vga none \
+    -display none \
+    -serial stdio \
+    -no-reboot
+fi
 echo "Disk image written to: ${CVM_IMAGE}"
 
 #rm "${LUKS_KS}"
