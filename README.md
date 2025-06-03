@@ -50,8 +50,13 @@ sudo dnf builddep https://src.fedoraproject.org/rpms/edk2/raw/f41/f/edk2.spec
 sudo dnf install cargo rust rust-std-static-x86_64-unknown-none \
                  autoconf automake autoconf-archive \
                  buildah podman cbindgen bindgen-cli CUnit-devel openssl \
-                 sqlite-devel virt-install ncat awk script xxd
+                 sqlite-devel ncat awk script xxd virt-install
 ```
+For automatic setup of the guest image, virt-install is used in a following step.
+This requires a running instance of libvirt, which will be installed by the `dnf` command
+above. Alternatively, a standalone instance of QEMU can be used as well. In this case
+the installation of libvirt and `virt-install` can be skipped and the `mtools` package
+is required instead.
 
 ## Build all components
 
@@ -83,6 +88,9 @@ to unseal the LUKS key.
 # Or you can specify your
 ./build-vm-image.sh --passphrase <custom LUKS passphrase>
 ```
+By default `virt-install` (requiring a running instance of libvirt) is used for automatic guest image installation.
+To attempt an installation without libvirt and using the QEMU binary built in the previous step directly,
+add the `--no-libvirt` option to the commands above. This can be useful in containerized environments, for example.
 
 ## Start Key Broker Service (KBS)
 
