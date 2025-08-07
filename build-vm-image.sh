@@ -72,9 +72,6 @@ cat /etc/crypttab | awk '{print \$1" "\$2" - tpm2-device=auto,tpm2-pcrs=0,1,4,5,
 echo 'add_drivers+=" tpm "' > /etc/dracut.conf.d/99-tpm.conf
 # Trigger initrd rebuild
 dnf reinstall -y kernel\*
-# Install coconut kernel
-dnf copr enable -y @virtmaint-sig/sev-snp-coconut
-dnf install -y kernel-snp-coconut tpm2-tools git make pwgen
 %end
 EOF
 
