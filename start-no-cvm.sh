@@ -69,8 +69,8 @@ $SUDO_CMD \
     -smp 4 \
     -no-reboot \
     -netdev user,id=vmnic -device e1000,netdev=vmnic,romfile= \
-    -drive if=pflash,format=raw,readonly=on,file=${SCRIPT_PATH}/edk2/Build/OvmfX64/DEBUG_GCC5/FV/OVMF_CODE.fd \
-    -drive if=pflash,format=raw,file=${SCRIPT_PATH}/edk2/Build/OvmfX64/DEBUG_GCC5/FV/OVMF_VARS.fd \
+    -drive if=pflash,format=raw,readonly=on,file=${SCRIPT_PATH}/edk2/Build/OvmfX64/DEBUG_GCC/FV/OVMF_CODE.fd \
+    -drive if=pflash,format=raw,file=${SCRIPT_PATH}/edk2/Build/OvmfX64/DEBUG_GCC/FV/OVMF_VARS.fd \
     -drive file=$IMAGE,if=none,id=disk0,format=qcow2,snapshot=off \
     -device virtio-scsi-pci,id=scsi0,disable-legacy=on \
     -device scsi-hd,drive=disk0,bootindex=0 \

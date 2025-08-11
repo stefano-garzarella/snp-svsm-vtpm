@@ -108,7 +108,7 @@ else
     --remote-name "${INSTALLER_URL}/images/pxeboot/vmlinuz" \
     --remote-name "${INSTALLER_URL}/images/pxeboot/initrd.img"
 
-  FW_CODE=${SCRIPT_PATH}/edk2/Build/OvmfX64/DEBUG_GCC5/FV/OVMF.fd
+  FW_CODE=${SCRIPT_PATH}/edk2/Build/OvmfX64/DEBUG_GCC/FV/OVMF.fd
 
   "${QEMU}" \
     -machine q35 \
