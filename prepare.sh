@@ -68,7 +68,7 @@ export PYTHON_COMMAND=python3
 make -j"$(nproc)" -C BaseTools/
 {
     source ./edksetup.sh --reconfig
-    build -a X64 -b DEBUG -t GCC5 -DTPM2_ENABLE \
+    build -a X64 -b DEBUG -t GCC -DTPM2_ENABLE \
         --pcd PcdUninstallMemAttrProtocol=TRUE -p OvmfPkg/OvmfPkgX64.dsc
 }
 popd
@@ -83,5 +83,5 @@ pushd "${SCRIPT_PATH}/svsm"
 git submodule sync
 git submodule update --init
 make utils/cbit aproxy
-FW_FILE=${SCRIPT_PATH}/edk2/Build/OvmfX64/DEBUG_GCC5/FV/OVMF.fd FEATURES=vtpm,attest make
+FW_FILE=${SCRIPT_PATH}/edk2/Build/OvmfX64/DEBUG_GCC/FV/OVMF.fd FEATURES=vtpm,attest make
 popd
