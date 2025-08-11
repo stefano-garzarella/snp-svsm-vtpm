@@ -128,6 +128,44 @@ SECRET="$(openssl rand -hex 64)"
 ./register-resource-in-kbs.sh -p "$SECRET"
 ```
 
+## Booting into the Confidential VM
+
+Now we can boot the guest image as a confidential VM:
+
+```shell
+./start-cvm.sh
+```
+
+Verify that we are actually running inside a SEV-SNP VM, at VMPL2 (with an SVSM present):
+
+```shell
+$ dmesg | grep SEV
+[    0.339970] Memory Encryption Features active: AMD SEV SEV-ES SEV-SNP
+[    0.340961] SEV: Status: SEV SEV-ES SEV-SNP
+[    0.452967] SEV: APIC: wakeup_secondary_cpu() replaced with wakeup_cpu_via_vmgexit()
+[    0.520995] SEV: Using SNP CPUID table, 29 entries present.
+[    0.521961] SEV: SNP running at VMPL2.
+[    0.802219] SEV: SNP guest platform devices initialized.
+[   12.889746] sev-guest sev-guest: Initialized SEV guest driver (using VMPCK2 communication key)
+
+```
+
+Check that the vTPM is SVSM-based and working:
+
+```shell
+$ dmesg | grep -i tpm-svsm
+[   12.905465] tpm-svsm tpm-svsm: SNP SVSM vTPM 2.0 device
+$ tpm2 pcrread
+...
+```
+
+Check that SecureBoot is active:
+
+```shell
+$ mokutil --sb-state
+SecureBoot enabled
+```
+
 ## Demo 1: Check memory encryption
 
 In this demo, we verify that the guest memory is encrypted and inaccessible
