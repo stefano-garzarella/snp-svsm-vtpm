@@ -128,6 +128,21 @@ SECRET="$(openssl rand -hex 64)"
 ./register-resource-in-kbs.sh -p "$SECRET"
 ```
 
+## Booting into the Confidential VM
+
+Check that SecureBoot is active:
+
+```shell
+[root@localhost ~]# mokutil --sb-state
+SecureBoot enabled
+```
+
+Check that the vTPM is working:
+
+```shell
+<TODO>
+```
+
 ## Demo 1: Check memory encryption
 
 In this demo, we verify that the guest memory is encrypted and inaccessible
