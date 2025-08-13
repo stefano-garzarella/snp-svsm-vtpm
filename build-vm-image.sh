@@ -61,7 +61,7 @@ skipx
 ignoredisk --only-use=vda
 clearpart --all --initlabel --disklabel=gpt --drives=vda
 part /boot/efi --size=512 --fstype=efi
-part /boot --size=512 --fstype=xfs --label=boot
+part /boot --size=1024 --fstype=xfs --label=boot
 part / --fstype="xfs" --ondisk=vda --encrypted --label=root --luks-version=luks2 --grow --passphrase "${CVM_LUKS_PASSPHRASE}"
 bootloader --append="console=ttyS0"
 
