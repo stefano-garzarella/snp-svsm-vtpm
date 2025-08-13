@@ -10,8 +10,9 @@ as a virtio-blk device over MMIO.
 Remote attestation is used to get the SVSM state key after a successful attestation.
 
 This PoC is based on the following Coconut SVSM PRs:
-- https://github.com/coconut-svsm/svsm/pull/635
-- https://github.com/coconut-svsm/svsm/pull/528
+
+- <https://github.com/coconut-svsm/svsm/pull/635>
+- <https://github.com/coconut-svsm/svsm/pull/528>
 
 This repository can be used for the following demos:
 
@@ -26,13 +27,15 @@ This POC was tested on Fedora 41 and Fedora 42.
 ### Host machine
 
 For running this demo, you need the host machine with:
+
 - AMD processor that supports SEV-SNP
 - Coconut Linux kernel installed, you can build it yourself or install it
   via copr in Fedora:
   - Coconut source kernel code.  
     You can build the host kernel by following the instructions here:
-    https://github.com/coconut-svsm/svsm/blob/main/Documentation/INSTALL.md#preparing-the-host
+    <https://github.com/coconut-svsm/svsm/blob/main/Documentation/INSTALL.md#preparing-the-host>
   - Fedora copr package  
+
 ```shell
 sudo dnf copr enable -y @virtmaint-sig/sev-snp-coconut
 sudo dnf install kernel-snp-coconut
@@ -52,6 +55,7 @@ sudo dnf install cargo rust rust-std-static-x86_64-unknown-none \
                  buildah podman cbindgen bindgen-cli CUnit-devel openssl \
                  sqlite-devel ncat awk script xxd virt-install
 ```
+
 For automatic setup of the guest image, virt-install is used in a following step.
 This requires a running instance of libvirt, which will be installed by the `dnf` command
 above. Alternatively, a standalone instance of QEMU can be used as well. In this case
@@ -88,6 +92,7 @@ to unseal the LUKS key.
 # Or you can specify your
 ./build-vm-image.sh --passphrase <custom LUKS passphrase>
 ```
+
 By default `virt-install` (requiring a running instance of libvirt) is used for automatic guest image installation.
 To attempt an installation without libvirt and using the QEMU binary built in the previous step directly,
 add the `--no-libvirt` option to the commands above. This can be useful in containerized environments, for example.
@@ -287,7 +292,6 @@ grubby --update-kernel=ALL --args="foo"
 Rebooting CVM we find that the rootfs is no longer automatically unlocked,
 as PCR 9 is different.
 
-
 ```shell
 poweroff
 
@@ -377,6 +381,7 @@ make
 
 At this point the EK certificate is written in the NVRAM, so the following
 commands now works also after reboot:
+
 ```shell
 tpm2_getekcertificate
 tpm2_nvread 0x1c00002
