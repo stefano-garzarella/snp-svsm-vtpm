@@ -482,3 +482,78 @@ WARNING:esys:src/tss2-esys/api/Esys_Load.c:324:Esys_Load_Finish() Received TPM E
 ERROR:esys:src/tss2-esys/api/Esys_Load.c:112:Esys_Load() Esys Finish ErrorCode (0x000001df) 
 ERROR: Eys_Load(0x1DF) - tpm:parameter(1):integrity check failed
 ```
+
+## Using a Unified Kernel Images (Advanced)
+
+The security of the guest OS can be improved by using a unified kernel image
+(UKI). This is a bootable UEFI binary that combines the Linux kernel, initial
+RAM disk image, and kernel command line.
+
+To install the UKI in the guest image and configure it as default boot option,
+boot the guest image using a conventional VM. This is necessary because the
+UEFI variable store in the SVSM is not persistent yet and does not retain the
+UEFI boot settings (this will be fixed in the future). After successful
+installation and reboot in a conventional VM with a functional variable store,
+the boot option has been picked up by shim and written to its `BOOT64.CSV`
+file, to be reused independently of the UEFI boot order.
+
+First, boot the image as a regular VM:
+
+```shell
+./start-no-cvm.sh
+```
+
+The GPT partition type UUID of the root partition needs to be set to the
+`SD_GPT_ROOT_X86_64` UUID so that it will be discovered by the
+systemd-gpt-autogenerator automatically. This removing the need to specify the
+root partition on the kernel command line, which is already included in the
+signed UKI and can not be changed. The type should have been set by the
+`build-vm-image.sh` script, but let's check before proceeding.
+
+```shell
+# Check that /dev/vda3 has the expected type UUID (4f68bce3-e8cd-4db1-96e7-fbcaf984b709)
+$ lsblk -o Name,PARTTYPE
+NAME                                          PARTTYPE
+sda
+├─sda1                                        c12a7328-f81f-11d2-ba4b-00a0c93ec93b
+├─sda2                                        0fc63daf-8483-4772-8e79-3d69d8477de4
+└─sda3                                        4f68bce3-e8cd-4db1-96e7-fbcaf984b709
+  └─luks-26669de3-9181-481a-bc17-6eb9c1b981cb
+zram0
+```
+
+Then install the UKI kernel image and the tool that configures it for direct
+boot (bypassing the GRUB bootloader) and reboot the VM (in non-confidential
+mode) to complete the installation (the reboot is required).
+
+```shell
+dnf install -y uki-direct kernel-uki-virt
+# reboot into the new kernel
+reboot
+```
+
+QEMU will exit and you need to restart the VM manually using `start-no-cvm.sh`.
+Now you should see that the GRUB menu does not show up and Linux is directly
+booting up. After the reboot, verify that the UKI is actually running:
+
+```shell
+$ kernel-bootcfg
+# C - BootCurrent, N - BootNext, O - BootOrder
+# --------------------------------------------
+# C   O  -  0004  -  Fedora Linux 43 (Server Edition Prerelease) 6.17.0-0.rc1.250812g53e760d89498.18.fc44.x86_64 (UKI)
+#     O  -  0003  -  Fedora
+#     O  -  0001  -  UEFI QEMU QEMU HARDDISK
+#     O  -  0000  -  UiApp
+#     O  -  0002  -  EFI Internal Shell
+```
+
+Now the image is ready for use in the CVM with the SVSM.
+
+```shell
+./start-cvm.sh
+```
+
+The TPM PCR values are now different since we a running a different kernel and
+the boot chain is different (no GRUB used). We need to re-seal the LUKS secret
+with the new PCRs, as described above in the [Seal a secret](#seal-a-secret)
+section.
