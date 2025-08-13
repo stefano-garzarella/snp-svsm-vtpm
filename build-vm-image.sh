@@ -42,6 +42,10 @@ set -ex
 
 mkdir -p ${SCRIPT_PATH}/images
 
+# GPT partition type UUID for the root partition, for automatic detection.
+# https://www.freedesktop.org/software/systemd/man/latest/systemd-gpt-auto-generator.html
+SD_GPT_ROOT_X86_64=4f68bce3-e8cd-4db1-96e7-fbcaf984b709
+
 # Anaconda kickstart file based on
 # https://gist.github.com/crobinso/830512728bf707a35e73755ed65988c4
 cat << EOF > "${LUKS_KS}"
@@ -66,6 +70,8 @@ bootloader --append="console=ttyS0"
 %end
 
 %post
+# Set GPT parition type UUID for the root parition
+parted --script /dev/vda type 3 $SD_GPT_ROOT_X86_64
 # use tpm to unlock the disk
 cat /etc/crypttab | awk '{print \$1" "\$2" - tpm2-device=auto,tpm2-pcrs=0,1,4,5,7,9"}' | tee /etc/crypttab
 # Put "tpm" driver in the initrd
