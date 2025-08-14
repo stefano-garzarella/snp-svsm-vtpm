@@ -73,5 +73,5 @@ MONITOR_PID=$!
 set -x
 
 pushd "${SCRIPT_PATH}/svsm"
-bin/aproxy --protocol kbs --unix "${PROXY_SOCK}" --url "${KBS_URL}" --force
+bin/aproxy --protocol kbs-test --unix "${PROXY_SOCK}" --url "${KBS_URL}" --force
 popd
