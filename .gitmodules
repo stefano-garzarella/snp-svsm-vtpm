@@ -15,4 +15,4 @@
 	url = https://github.com/coconut-svsm/qemu.git
 [submodule "kbs/kbs-test"]
 	path = kbs/kbs-test
-	url = https://github.com/tylerfanelli/kbs-test.git
+	url = https://github.com/coconut-svsm/kbs-test.git
