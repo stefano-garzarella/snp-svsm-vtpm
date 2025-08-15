@@ -72,6 +72,7 @@ bootloader --append="console=ttyS0"
 %post
 # Set GPT parition type UUID for the root parition
 parted --script /dev/vda type 3 $SD_GPT_ROOT_X86_64
+dnf install -y tpm2-tools
 # use tpm to unlock the disk
 cat /etc/crypttab | awk '{print \$1" "\$2" - tpm2-device=auto,tpm2-pcrs=0,1,4,5,7,9"}' | tee /etc/crypttab
 # Put "tpm" driver in the initrd
