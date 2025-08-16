@@ -50,7 +50,7 @@ truncate -s0 ${LOG_FILE}
 
 # launch_guest.sh uses stty, so let's use script to create a terminal session
 script -q -f -c "${SCRIPT_PATH}/svsm/scripts/launch_guest.sh --qemu ${QEMU} \
-    --proxy ${PROXY_SOCK} \
+    --aproxy ${PROXY_SOCK} \
     --state ${TPM_STATE}" --log-out ${LOG_FILE} &
 CVM_PID=$!
 

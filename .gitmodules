@@ -9,7 +9,7 @@
 	url = https://github.com/microsoft/igvm
 [submodule "svsm"]
 	path = svsm
-	url = https://github.com/stefano-garzarella/svsm.git
+	url = https://github.com/osteffenrh/coconut-svsm.git
 [submodule "qemu"]
 	path = qemu
 	url = https://github.com/coconut-svsm/qemu.git
