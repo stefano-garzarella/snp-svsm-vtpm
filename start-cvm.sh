@@ -38,7 +38,7 @@ done
 set -ex
 
 ${SCRIPT_PATH}/svsm/scripts/launch_guest.sh --qemu "${QEMU}" \
-    --proxy "${PROXY_SOCK}" \
+    --aproxy "${PROXY_SOCK}" \
     --state "${TPM_STATE}" \
     --monitor "${QEMU_MONITOR_PORT}" \
     ${IMAGE}
