@@ -69,7 +69,8 @@ make -j"$(nproc)" -C BaseTools/
 {
     source ./edksetup.sh --reconfig
     build -a X64 -b DEBUG -t GCC -DTPM2_ENABLE \
-        --pcd PcdUninstallMemAttrProtocol=TRUE -p OvmfPkg/OvmfPkgX64.dsc
+        --pcd PcdUninstallMemAttrProtocol=TRUE -p OvmfPkg/OvmfPkgX64.dsc \
+        -D QEMU_PV_VARS=TRUE -D SECURE_BOOT=TRUE
 }
 popd
 
