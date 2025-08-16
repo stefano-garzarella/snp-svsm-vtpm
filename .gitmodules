@@ -12,7 +12,7 @@
 	url = https://github.com/stefano-garzarella/svsm.git
 [submodule "qemu"]
 	path = qemu
-	url = https://github.com/osteffenrh/qemu.git
+	url = https://github.com/coconut-svsm/qemu.git
 [submodule "kbs/kbs-test"]
 	path = kbs/kbs-test
 	url = https://github.com/tylerfanelli/kbs-test.git
