@@ -84,5 +84,5 @@ pushd "${SCRIPT_PATH}/svsm"
 git submodule sync
 git submodule update --init
 make utils/cbit aproxy
-FW_FILE=${SCRIPT_PATH}/edk2/Build/OvmfX64/DEBUG_GCC/FV/OVMF.fd FEATURES=vtpm,attest make
+FW_FILE=${SCRIPT_PATH}/edk2/Build/OvmfX64/DEBUG_GCC/FV/OVMF.fd FEATURES=vtpm,attest,virtio-drivers make
 popd
