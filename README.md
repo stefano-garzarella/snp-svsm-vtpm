@@ -53,7 +53,7 @@ sudo dnf builddep https://src.fedoraproject.org/rpms/edk2/raw/f41/f/edk2.spec
 sudo dnf install cargo rust rust-std-static-x86_64-unknown-none \
                  autoconf automake autoconf-archive \
                  buildah podman cbindgen bindgen-cli CUnit-devel openssl \
-                 sqlite-devel ncat awk script xxd virt-install
+                 sqlite-devel ncat awk script xxd virt-install edk2-ovmf
 ```
 
 For automatic setup of the guest image, virt-install is used in a following step.
