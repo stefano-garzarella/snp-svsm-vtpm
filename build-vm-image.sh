@@ -77,8 +77,11 @@ dnf install -y tpm2-tools
 cat /etc/crypttab | awk '{print \$1" "\$2" - tpm2-device=auto,tpm2-pcrs=0,1,4,5,7,9"}' | tee /etc/crypttab
 # Put "tpm" driver in the initrd
 echo 'add_drivers+=" tpm "' > /etc/dracut.conf.d/99-tpm.conf
-# Trigger initrd rebuild
+# Trigger initrd rebuild (for the stock kernel)
 dracut --regenerate-all --force
+# Install newer kernel from rawhide
+dnf --assumeyes install fedora-repos-rawhide
+dnf --assumeyes --enablerepo=rawhide upgrade kernel
 %end
 EOF
 
