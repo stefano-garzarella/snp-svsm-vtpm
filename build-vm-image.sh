@@ -1,4 +1,7 @@
 #!/bin/bash
+
+set -ue
+
 SCRIPT_PATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 
 # Load VM configuration
@@ -17,11 +20,30 @@ function usage
     echo -e " -h, --help                print this help"
 }
 
-while [ "$1" != "" ]; do
+INSTALLER_URL=$INSTALLER_URL_F42
+CVM_IMAGE_DIST=${CVM_IMAGE}_f42
+
+while [[ $# -gt 0 ]]; do
     case $1 in
         -p | --passphrase )
             shift
             CVM_LUKS_PASSPHRASE=$1
+            ;;
+        --distro)
+            shift
+            case $1 in
+              f42)
+                INSTALLER_URL=$INSTALLER_URL_F42
+                CVM_IMAGE_DIST=${CVM_IMAGE}_f42
+                ;;
+              c10s)
+                INSTALLER_URL=$INSTALLER_URL_C10S
+                CVM_IMAGE_DIST=${CVM_IMAGE}_c10s
+                ;;
+              *)
+              echo "Unknown distribution: $1"
+              exit 1
+            esac
             ;;
         -h | --help )
             usage
@@ -40,7 +62,7 @@ done
 
 set -ex
 
-mkdir -p ${SCRIPT_PATH}/images
+mkdir -p "${SCRIPT_PATH}/images"
 
 # GPT partition type UUID for the root partition, for automatic detection.
 # https://www.freedesktop.org/software/systemd/man/latest/systemd-gpt-auto-generator.html
@@ -88,7 +110,7 @@ EOF
 if [ "$USE_LIBVIRT" == "yes" ]; then
 
   virt-install --connect qemu:///session \
-      --ram 4096 --vcpus 4 --disk path="${CVM_IMAGE}",size=20 \
+      --ram 4096 --vcpus 4 --disk path="${CVM_IMAGE_DIST}",size=20 \
       --location "${INSTALLER_URL}" \
       --noreboot --transient --destroy-on-exit --nographic \
       --initrd-inject "${LUKS_KS}" --extra-args "inst.ks=file:/luks.ks console=ttyS0" \
@@ -100,7 +122,7 @@ if [ "$USE_LIBVIRT" == "yes" ]; then
 
 else
 
-  "$QEMU_IMG" create -f qcow2 "${CVM_IMAGE}" 10G
+  "$QEMU_IMG" create -f qcow2 "${CVM_IMAGE_DIST}" 10G
 
   OEMDRV=$(mktemp)
   trap 'rm ${OEMDRV} || true' EXIT
@@ -126,7 +148,7 @@ else
     -blockdev node-name=code,driver=file,filename="${FW_CODE}",read-only=on \
     -machine pflash0=code \
     -device virtio-rng-pci \
-    -drive if=virtio,file="${CVM_IMAGE}" \
+    -drive if=virtio,file="${CVM_IMAGE_DIST}" \
     -drive if=virtio,file="${OEMDRV}",read-only=on,format=raw \
     -kernel ./vmlinuz \
     -initrd ./initrd.img \
@@ -136,6 +158,8 @@ else
     -serial stdio \
     -no-reboot
 fi
-echo "Disk image written to: ${CVM_IMAGE}"
+echo "Disk image written to: ${CVM_IMAGE_DIST}"
+ln -s "$CVM_IMAGE_DIST" "$CVM_IMAGE"
+echo "... and linked to ${CVM_IMAGE}"
 
 #rm "${LUKS_KS}"
