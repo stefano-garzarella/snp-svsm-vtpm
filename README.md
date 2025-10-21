@@ -48,7 +48,22 @@ Rust projects, so I recommend that you install the following packages
 (for Fedora 41) to use the scripts contained in this demo:
 
 ```shell
-sudo dnf builddep https://src.fedoraproject.org/rpms/qemu/raw/f41/f/qemu.spec
+# QEMU depepdencies
+sudo dnf install \
+    bzip2 \
+    findutils \
+    gcc \
+    git \
+    diffutils \
+    glib2-devel \
+    libfdt-devel \
+    make \
+    ninja-build \
+    pixman-devel \
+    python3 \
+    tar \
+    zlib-devel
+
 sudo dnf builddep https://src.fedoraproject.org/rpms/edk2/raw/f41/f/edk2.spec
 sudo dnf install cargo rust rust-std-static-x86_64-unknown-none \
                  autoconf automake autoconf-archive \
