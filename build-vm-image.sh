@@ -1,4 +1,7 @@
 #!/bin/bash
+
+set -ue
+
 SCRIPT_PATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 
 # Load VM configuration
@@ -13,15 +16,29 @@ function usage
     echo -e ""
     echo -e "Build a VM image with rootfs encrypted"
     echo -e ""
+    echo -e "     --distro <distro>     Select distro to install (default = ${DEFAULT_DISTRO})"
+    echo -e "                           <distro can be> ${!INSTALLER_URLS[*]}"
+    echo -e "     --force               Overwrite the output file"
     echo -e " -p, --passphrase {PASS}   LUKS passphrase [default: ${CVM_LUKS_PASSPHRASE}]"
     echo -e " -h, --help                print this help"
 }
 
-while [ "$1" != "" ]; do
+INSTALLER_URL=${INSTALLER_URLS[$DEFAULT_DISTRO]}
+
+while [[ $# -gt 0 ]]; do
     case $1 in
         -p | --passphrase )
             shift
             CVM_LUKS_PASSPHRASE=$1
+            ;;
+        --distro)
+            shift
+            INSTALLER_URL=${INSTALLER_URLS[$1]:-}
+            if [ -z "$INSTALLER_URL" ]; then
+              echo -e "\nUnknown distribution: $1\n"
+              usage
+              exit 1
+            fi
             ;;
         -h | --help )
             usage
@@ -29,6 +46,9 @@ while [ "$1" != "" ]; do
             ;;
         --no-libvirt)
             USE_LIBVIRT=no
+            ;;
+        --force)
+            FORCE=yes
             ;;
         * )
             echo -e "\nParameter not found: $1\n"
@@ -38,9 +58,18 @@ while [ "$1" != "" ]; do
     shift
 done
 
+if [ -f "${CVM_IMAGE}" ]; then
+  if [ "${FORCE:-no}" != "yes" ]; then
+    echo "VM image ${CVM_IMAGE} already exists. Use --force to overwrite."
+    exit 1
+  else
+    rm "${CVM_IMAGE}"
+  fi
+fi
+
 set -ex
 
-mkdir -p ${SCRIPT_PATH}/images
+mkdir -p "${SCRIPT_PATH}/images"
 
 # GPT partition type UUID for the root partition, for automatic detection.
 # https://www.freedesktop.org/software/systemd/man/latest/systemd-gpt-auto-generator.html
