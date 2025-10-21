@@ -64,7 +64,21 @@ sudo dnf install \
     tar \
     zlib-devel
 
-sudo dnf builddep https://src.fedoraproject.org/rpms/edk2/raw/f41/f/edk2.spec
+# OVMF depepdencies
+sudo dnf install \
+    acpica-tools \
+    gcc \
+    gcc-c++ \
+    git \
+    libuuid-devel \
+    libX11-devel \
+    libXext-devel \
+    make \
+    nasm \
+    python3 \
+    python3-pip \
+    python3-setuptools
+
 sudo dnf install cargo rust rust-std-static-x86_64-unknown-none \
                  autoconf automake autoconf-archive \
                  buildah podman cbindgen bindgen-cli CUnit-devel openssl \
