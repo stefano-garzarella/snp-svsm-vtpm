@@ -54,6 +54,7 @@ if [ ! -d "./build" ]; then
     PKG_CONFIG_PATH=${SCRIPT_PATH}/install/lib64/pkgconfig ./configure \
         --disable-docs --disable-user --target-list=x86_64-softmmu \
         --disable-libnfs \
+        --enable-slirp \
         --enable-igvm --extra-ldflags=-L"${SCRIPT_PATH}/install/lib64" \
         --extra-cflags=-I"${SCRIPT_PATH}/install/include"
 fi
