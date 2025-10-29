@@ -76,7 +76,8 @@ dnf install -y tpm2-tools
 # We need an updated kernel for SVSM vTPM driver (6.16) and UEFI var (6.17)
 dnf upgrade -y kernel
 # use tpm to unlock the disk
-cat /etc/crypttab | awk '{print \$1" "\$2" - tpm2-device=auto,tpm2-pcrs=0,1,4,5,7,9"}' | tee /etc/crypttab
+cp /etc/crypttab /etc/crypttab.orig
+cat /etc/crypttab.orig | awk '{print \$1" "\$2" - tpm2-device=auto,discard"}' | tee /etc/crypttab
 # Put "tpm" driver in the initrd
 echo 'add_drivers+=" tpm tpm_svsm "' > /etc/dracut.conf.d/99-tpm.conf
 # Trigger initrd rebuild
