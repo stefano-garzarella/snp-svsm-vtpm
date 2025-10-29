@@ -565,7 +565,7 @@ boot (bypassing the GRUB bootloader) and reboot the VM (in non-confidential
 mode) to complete the installation (the reboot is required).
 
 ```shell
-dnf --enablerepo=rawhide install --assumeyes uki-direct kernel-uki-virt
+dnf install --assumeyes uki-direct kernel-uki-virt
 # reboot into the new kernel
 reboot
 ```

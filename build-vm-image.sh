@@ -73,15 +73,14 @@ bootloader --append="console=ttyS0"
 # Set GPT parition type UUID for the root parition
 parted --script /dev/vda type 3 $SD_GPT_ROOT_X86_64
 dnf install -y tpm2-tools
+# We need an updated kernel for SVSM vTPM driver (6.16) and UEFI var (6.17)
+dnf upgrade -y kernel
 # use tpm to unlock the disk
 cat /etc/crypttab | awk '{print \$1" "\$2" - tpm2-device=auto,tpm2-pcrs=0,1,4,5,7,9"}' | tee /etc/crypttab
 # Put "tpm" driver in the initrd
-echo 'add_drivers+=" tpm "' > /etc/dracut.conf.d/99-tpm.conf
-# Trigger initrd rebuild (for the stock kernel)
+echo 'add_drivers+=" tpm tpm_svsm "' > /etc/dracut.conf.d/99-tpm.conf
+# Trigger initrd rebuild
 dracut --regenerate-all --force
-# Install newer kernel from rawhide
-dnf --assumeyes install fedora-repos-rawhide
-dnf --assumeyes --enablerepo=rawhide upgrade kernel
 %end
 EOF
 
