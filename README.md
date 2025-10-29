@@ -128,12 +128,32 @@ SECRET="$(openssl rand -hex 64)"
 ./register-resource-in-kbs.sh -p "$SECRET"
 ```
 
+### Manufacture the TCG TPM
+
+This operation is only required the first time, or when we want to regenerate
+the TPM state.
+In this way, the TPM's EK are recreated and NV state reset, so all sealed
+secrets can no longer be unsealed.
+
+Note: We currently do not have a tool available, so the script clears the SVSM
+state and launches a diskless CVM. In this way SVSM, finding the state empty,
+generates a new vTPM.
+
+```shell
+./remanufacture-tpm.sh
+```
+
 ## Booting into the Confidential VM
 
 Now we can boot the guest image as a confidential VM:
 
 ```shell
 ./start-cvm.sh
+
+# LUKS passphrase is now required, since the key is not yet sealed
+# with the TPM:
+# Please enter passphrase for disk QEMU_HARDDISK (luks-bf91e8fe-c1e3-4696-937f-51c83d312eb9)::
+# MY-LUKS-PASSPHRASE or <custom LUKS passphrase>
 ```
 
 Verify that we are actually running inside a SEV-SNP VM, at VMPL2 (with an SVSM present):
@@ -506,7 +526,7 @@ emulated TPM is unable to unseal the keys.
 # Generate a new encryption key
 SECRET="$(openssl rand -hex 64)"
 
-# Register the new SVMS encryption state key
+# Register the new SVSM encryption state key
 ./register-resource-in-kbs.sh -p $(openssl rand -hex 64)
 
 ./start-cvm.sh
@@ -575,6 +595,8 @@ Now you should see that the GRUB menu does not show up and Linux is directly
 booting up. After the reboot, verify that the UKI is actually running:
 
 ```shell
+./start-no-cvm.sh
+
 $ kernel-bootcfg
 # C - BootCurrent, N - BootNext, O - BootOrder
 # --------------------------------------------
