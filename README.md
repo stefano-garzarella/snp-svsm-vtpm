@@ -43,7 +43,7 @@ sudo dnf install kernel-snp-coconut
 
 ### Build machine
 
-This repository contains the QEMU code, EDK2 code, MS TPM simulator, and several
+This repository contains the QEMU code, EDK2 code, TCG TPM simulator, and several
 Rust projects, so I recommend that you install the following packages
 (for Fedora 41) to use the scripts contained in this demo:
 
@@ -246,7 +246,7 @@ in a trusted environment.
 
 [![Video demo](https://img.youtube.com/vi/TplFlQ6aY1s/maxresdefault.jpg)](https://www.youtube.com/watch?v=TplFlQ6aY1s)
 
-### Manufacture the MS TPM
+### Manufacture the TCG TPM
 
 This operation is only required the first time, or when we want to regenerate
 the TPM state.
@@ -376,7 +376,7 @@ So let's try re-manufacturing it. In this way the TPM's EK are regenerated and
 NV state completely reset.
 
 ```shell
-# Re-manufacture the MS TPM state
+# Re-manufacture the TCG TPM state
 ./remanufacture-tpm.sh
 
 ./start-cvm.sh
@@ -401,7 +401,7 @@ systemd-cryptenroll /dev/sda3 --wipe-slot=tpm2 --tpm2-device=auto \
 
 ### Install EK certificate in the vTPM NVRAM
 
-The MS-TPM does not generate an EK certificate during manufacture, so
+The TCG-TPM does not generate an EK certificate during manufacture, so
 launching `tpm2_getekcertificate` or `tpm2_nvread 0x1c00002` in the CVM will
 get an error.
 
@@ -480,7 +480,7 @@ re-manufacturing it. In this way the TPM's EK are regenerated and NV state
 completely reset.
 
 ```shell
-# Re-manufacture the MS TPM state
+# Re-manufacture the TCG TPM state
 ./remanufacture-tpm.sh
 
 ./start-cvm.sh
