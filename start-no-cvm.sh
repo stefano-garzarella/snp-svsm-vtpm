@@ -67,6 +67,7 @@ $SUDO_CMD \
     -machine q35,accel=kvm,memory-backend=mem0 \
     -object memory-backend-memfd,size=2G,id=mem0 \
     -smp 4 \
+    -cpu max \
     -no-reboot \
     -netdev user,id=vmnic -device e1000,netdev=vmnic,romfile= \
     -drive if=pflash,format=raw,readonly=on,file=/usr/share/edk2/ovmf/OVMF_CODE.fd \
