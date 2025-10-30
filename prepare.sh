@@ -86,12 +86,6 @@ fi
 }
 popd
 
-pushd "${SCRIPT_PATH}/ms-tpm-containerized-build"
-git submodule sync
-git submodule update --init
-make
-popd
-
 pushd "${SCRIPT_PATH}/svsm"
 git submodule sync
 git submodule update --init

@@ -1,9 +1,6 @@
 [submodule "edk2"]
 	path = edk2
 	url = https://github.com/osteffenrh/edk2.git
-[submodule "ms-tpm-containerized-build"]
-	path = ms-tpm-containerized-build
-	url = https://github.com/stefano-garzarella/ms-tpm-containerized-build.git
 [submodule "igvm"]
 	path = igvm
 	url = https://github.com/microsoft/igvm
