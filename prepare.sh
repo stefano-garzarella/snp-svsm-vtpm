@@ -10,12 +10,18 @@ function usage
     echo -e ""
     echo -e "Initialize git submodules and build QEMU, EDK2, SVSM, etc."
     echo -e ""
+    echo -e "     --no-varstore   Disable the SVSM-based UEFI varaible store (experimental)"
     echo -e " -c, --clean         clean all previous artifacts"
     echo -e " -h, --help          print this help"
 }
 
+OPT_VARSTORE=1
+
 while [ "$1" != "" ]; do
     case $1 in
+      --no-varstore)
+            OPT_VARSTORE=0
+            ;;
         -c | --clean )
             CLEAN=1
             ;;
@@ -67,11 +73,16 @@ git submodule update --init
 export PYTHON3_ENABLE=TRUE
 export PYTHON_COMMAND=python3
 make -j"$(nproc)" -C BaseTools/
+OVMF_EXTRA_OPTS=""
+if [[ $OPT_VARSTORE -eq 1 ]]; then
+  OVMF_EXTRA_OPTS+="-D QEMU_PV_VARS=TRUE -D SECURE_BOOT=TRUE"
+fi
 {
     source ./edksetup.sh --reconfig
+    set -x
     build -a X64 -b DEBUG -t GCC -DTPM2_ENABLE \
         --pcd PcdUninstallMemAttrProtocol=TRUE -p OvmfPkg/OvmfPkgX64.dsc \
-        -D QEMU_PV_VARS=TRUE -D SECURE_BOOT=TRUE
+        $OVMF_EXTRA_OPTS
 }
 popd
 
@@ -85,5 +96,12 @@ pushd "${SCRIPT_PATH}/svsm"
 git submodule sync
 git submodule update --init
 make utils/cbit aproxy
-FW_FILE=${SCRIPT_PATH}/edk2/Build/OvmfX64/DEBUG_GCC/FV/OVMF.fd FEATURES=vtpm,attest,virtio-drivers,uefivars,secureboot make
+SVSM_FEATURES="vtpm,attest,virtio-drivers"
+if [[ $OPT_VARSTORE -eq 1 ]]; then
+  SVSM_FEATURES+=",uefivars,secureboot"
+fi
+{
+  set -x
+  FW_FILE=${SCRIPT_PATH}/edk2/Build/OvmfX64/DEBUG_GCC/FV/OVMF.fd FEATURES=$SVSM_FEATURES make
+}
 popd
