@@ -90,9 +90,9 @@ pushd "${SCRIPT_PATH}/svsm"
 git submodule sync
 git submodule update --init
 make aproxy
-SVSM_FEATURES="vtpm,attest,virtio-drivers"
+SVSM_FEATURES="vtpm,attest,virtio-drivers,enable-console-log"
 if [[ $OPT_VARSTORE -eq 1 ]]; then
-  SVSM_FEATURES+=",uefivars,secureboot"
+  SVSM_FEATURES+=",uefivars,secureboot,persistence"
 fi
 {
   set -x
