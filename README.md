@@ -91,7 +91,7 @@ sudo dnf install \
 sudo dnf install cargo cargo-c cmake rust rust-std-static-x86_64-unknown-none \
                  buildah podman cbindgen bindgen-cli CUnit-devel openssl \
                  sqlite-devel ncat gawk util-linux xxd virt-install edk2-ovmf \
-                 perl gettext-envsubst glibc-static
+                 perl gettext-envsubst glibc-static mkfs-vfat mtools
 ```
 
 For automatic setup of the guest image, virt-install is used in a following step.
