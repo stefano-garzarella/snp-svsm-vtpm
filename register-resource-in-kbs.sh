@@ -39,8 +39,8 @@ done
 
 set -ex
 
-MEASUREMENT="$("${SCRIPT_PATH}/svsm/bin/igvmmeasure" \
-    --check-kvm ${SCRIPT_PATH}/svsm/bin/coconut-qemu.igvm measure -b)"
+MEASUREMENT="$(cd "${SCRIPT_PATH}/svsm" &&
+  cargo run --bin igvmmeasure -- --check-kvm ${SCRIPT_PATH}/svsm/bin/coconut-qemu.igvm measure -b)"
 
 echo $MEASUREMENT | xxd -r -p | base64 -w 0 > $KBS_MEASUREMENT
 echo $SECRET | xxd -r -p | base64 -w 0 > $KBS_SECRET
