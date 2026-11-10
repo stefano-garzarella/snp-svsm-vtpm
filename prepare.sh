@@ -82,6 +82,8 @@ fi
     set -x
     build -a X64 -b DEBUG -t GCC -DTPM2_ENABLE \
         --pcd PcdUninstallMemAttrProtocol=TRUE -p OvmfPkg/OvmfPkgX64.dsc \
+        -D DEBUG_ON_SERIAL_PORT \
+        -D DEBUG_VERBOSE \
         $OVMF_EXTRA_OPTS
 }
 popd
