@@ -89,7 +89,6 @@ sudo dnf install \
 
 # SVSM and igvm dependencies
 sudo dnf install cargo cargo-c cmake rust rust-std-static-x86_64-unknown-none \
-                 autoconf automake autoconf-archive \
                  buildah podman cbindgen bindgen-cli CUnit-devel openssl \
                  sqlite-devel ncat gawk util-linux xxd virt-install edk2-ovmf \
                  perl gettext-envsubst glibc-static
