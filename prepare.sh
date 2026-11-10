@@ -89,7 +89,7 @@ popd
 pushd "${SCRIPT_PATH}/svsm"
 git submodule sync
 git submodule update --init
-make utils/cbit aproxy
+make aproxy
 SVSM_FEATURES="vtpm,attest,virtio-drivers"
 if [[ $OPT_VARSTORE -eq 1 ]]; then
   SVSM_FEATURES+=",uefivars,secureboot"
