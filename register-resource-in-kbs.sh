@@ -15,9 +15,7 @@ function usage
     echo -e " -h, --help                print this help"
 }
 
-# we are using XTS for the encryption layer with AES256
-# XTS requires two AES256 keys, so 512 bits (64 bytes) in total
-SECRET="$(openssl rand -hex 64)"
+SECRET="$(openssl rand -hex 32)"
 
 while [ "$1" != "" ]; do
     case $1 in
@@ -42,8 +40,8 @@ set -ex
 MEASUREMENT="$(cd "${SCRIPT_PATH}/svsm" &&
   cargo run --bin igvmmeasure -- --check-kvm ${SCRIPT_PATH}/svsm/bin/coconut-qemu.igvm measure -b)"
 
-echo $MEASUREMENT | xxd -r -p | base64 -w 0 > $KBS_MEASUREMENT
-echo $SECRET | xxd -r -p | base64 -w 0 > $KBS_SECRET
+echo $MEASUREMENT >$KBS_MEASUREMENT
+echo $SECRET >$KBS_SECRET
 
 if [ -f "$KBS_PID" ]; then
     PID=$(cat "$KBS_PID")
