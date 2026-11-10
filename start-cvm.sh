@@ -42,5 +42,6 @@ scripts/launch_guest.sh --qemu "${QEMU}" \
     --vsock 3 --attestport "$PROXY_VSOCK" \
     --state "${TPM_STATE}" \
     ${IMAGE} \
+    --snapshot off \
     -- \
     -monitor tcp:127.0.0.1:${QEMU_MONITOR_PORT},server,nowait
