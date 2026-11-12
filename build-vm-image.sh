@@ -86,6 +86,7 @@ lang en_US.UTF-8
 reboot
 text
 skipx
+network --hostname "snp-guest"
 
 ignoredisk --only-use=vda
 clearpart --all --initlabel --disklabel=gpt --drives=vda
