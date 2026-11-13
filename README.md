@@ -171,26 +171,20 @@ This script first calculates the launch measurement (SVSM, OVMF, etc.) and then
 registers it in the Key Broker server along with the SVSM state key (512 bits).
 
 ```shell
-# we are using XTS for the encryption layer with AES256
-# XTS requires two AES256 keys, so 512 bits (64 bytes) in total
-SECRET="$(openssl rand -hex 64)"
-
 ./register-resource-in-kbs.sh -p "$SECRET"
 ```
 
-### Manufacture the TCG TPM
+### Create an empty state file
 
-This operation is only required the first time, or when we want to regenerate
-the TPM state.
-In this way, the TPM's EK are recreated and NV state reset, so all sealed
-secrets can no longer be unsealed.
+This operation is required every time you register a new SVSM binary/launch
+measurement in KBS, since that also resets the encryption key.
 
-Note: We currently do not have a tool available, so the script clears the SVSM
-state and launches a diskless CVM. In this way SVSM, finding the state empty,
-generates a new vTPM.
+The generated state file is empty, and simply contains a cocoonfs header that
+instructs SVSM to initialize the storage after successful remote attestation.
+The encryption key is obtained as part of the attestation step.
 
 ```shell
-./remanufacture-tpm.sh
+./generate-state-file.sh
 ```
 
 ## Booting into the Confidential VM
